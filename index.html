@@ -1,1 +1,503 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat IA - Álgebra Lineal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap 5 CSS CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  /> <!-- [web:27] -->
+
+  <!-- jQuery CDN -->
+  <script
+    src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous">
+  </script> <!-- [web:6] -->
+
+  <!-- Bootstrap JS Bundle -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous">
+  </script> <!-- [web:27] -->
+
+  <style>
+    body {
+      background-color: #05060a;
+      color: #e4e9ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .chat-wrapper {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .chat-card {
+      width: 100%;
+      max-width: 900px;
+      background: radial-gradient(circle at top left, #09101f 0, #03040a 45%, #05070f 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(60, 120, 255, 0.4);
+      box-shadow:
+        0 0 30px rgba(0, 0, 0, 0.7),
+        0 0 40px rgba(30, 80, 255, 0.15);
+      padding: 1.5rem;
+    }
+
+    .chat-header {
+      border-bottom: 1px solid rgba(80, 130, 255, 0.35);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(18, 42, 120, 0.35);
+      border: 1px solid rgba(98, 156, 255, 0.5);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8ea7ff;
+    }
+
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #6cf1ff 0, #307dff 50%, #111827 100%);
+      box-shadow: 0 0 10px rgba(96, 245, 255, 0.9);
+    }
+
+    .chat-subtitle {
+      font-size: 0.9rem;
+      color: #9fa8d8;
+    }
+
+    .badge-topic {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 0.2rem 0.6rem;
+      background: rgba(33, 150, 243, 0.08);
+      border: 1px solid rgba(33, 150, 243, 0.45);
+      color: #9ecbff;
+    }
+
+    .chat-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .messages-panel {
+      background: linear-gradient(145deg, rgba(9, 12, 30, 0.8), rgba(3, 7, 23, 0.98));
+      border-radius: 14px;
+      border: 1px solid rgba(60, 99, 255, 0.35);
+      padding: 1rem;
+      min-height: 200px;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .messages-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .messages-panel::-webkit-scrollbar-thumb {
+      background: rgba(70, 112, 255, 0.6);
+      border-radius: 999px;
+    }
+
+    .message {
+      margin-bottom: 0.75rem;
+    }
+
+    .message-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: #7a8bcf;
+      margin-bottom: 0.2rem;
+    }
+
+    .user-bubble {
+      background: rgba(23, 37, 84, 0.9);
+      border-radius: 12px;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid rgba(96, 165, 250, 0.6);
+      color: #e5edff;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+
+    .ai-bubble {
+      background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), rgba(15, 23, 42, 0.98));
+      border-radius: 12px;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid rgba(129, 140, 248, 0.7);
+      color: #dde7ff;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+
+    .system-note {
+      font-size: 0.75rem;
+      color: #7683b3;
+      margin-top: 0.4rem;
+      font-style: italic;
+    }
+
+    .chat-input-wrapper {
+      background: rgba(6, 10, 26, 0.9);
+      border-radius: 14px;
+      border: 1px solid rgba(76, 139, 255, 0.5);
+      padding: 0.6rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .prompt-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+    }
+
+    .prompt-textarea {
+      background: transparent;
+      border: none;
+      resize: none;
+      color: #e6eeff;
+      font-size: 0.9rem;
+      max-height: 120px;
+      min-height: 52px;
+      padding: 0;
+      outline: none;
+      box-shadow: none;
+    }
+
+    .prompt-textarea::placeholder {
+      color: #6471a5;
+    }
+
+    .prompt-textarea:focus {
+      box-shadow: none;
+    }
+
+    .btn-send {
+      white-space: nowrap;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      border: 1px solid rgba(191, 219, 254, 0.8);
+      color: #f9fbff;
+      font-size: 0.86rem;
+      padding-inline: 1.1rem;
+      padding-block: 0.55rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow:
+        0 10px 25px rgba(37, 99, 235, 0.45),
+        0 0 15px rgba(56, 189, 248, 0.7);
+    }
+
+    .btn-send:disabled {
+      opacity: 0.6;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .btn-send span.icon {
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .helper-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #7c8ad0;
+    }
+
+    .quick-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .quick-pill {
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 0.15rem 0.6rem;
+      border: 1px dashed rgba(96, 165, 250, 0.55);
+      color: #9db8ff;
+      background: rgba(11, 22, 60, 0.9);
+      font-size: 0.72rem;
+    }
+
+    .quick-pill:hover {
+      background: rgba(24, 45, 95, 0.9);
+    }
+
+    .api-status {
+      font-size: 0.75rem;
+      color: #6ee7b7;
+    }
+
+    .api-status.error {
+      color: #f97373;
+    }
+
+    .loader-dots {
+      display: inline-flex;
+      gap: 0.16rem;
+      margin-left: 0.2rem;
+      vertical-align: middle;
+    }
+
+    .loader-dots span {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #93c5fd;
+      animation: pulse 1.1s infinite ease-in-out;
+    }
+
+    .loader-dots span:nth-child(2) {
+      animation-delay: 0.12s;
+    }
+
+    .loader-dots span:nth-child(3) {
+      animation-delay: 0.24s;
+    }
+
+    @keyframes pulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .chat-card {
+        padding: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-wrapper">
+    <div class="chat-card">
+      <div class="chat-header d-flex justify-content-between align-items-center">
+        <div>
+          <div class="brand-pill mb-1">
+            <span class="brand-dot"></span>
+            <span>Chat IA · Demo</span>
+          </div>
+          <h1 class="h5 mb-0">Asistente de Álgebra Lineal</h1>
+          <p class="chat-subtitle mb-0">
+            Formula ejercicios, pide explicaciones de vectores, matrices, espacios vectoriales y más.
+          </p>
+        </div>
+        <div class="text-end">
+          <span class="badge-topic">Álgebra lineal · v0.2</span>
+        </div>
+      </div>
+
+      <div class="chat-body">
+        <!-- Panel de mensajes -->
+        <div id="messagesPanel" class="messages-panel">
+          <div class="message mb-2">
+            <div class="message-label">IA · Bienvenida</div>
+            <div class="ai-bubble">
+              Hola, soy tu asistente de álgebra lineal conectado a Groq.<br>
+              Escribe un enunciado como:<br>
+              · "Explica paso a paso cómo diagonalizar una matriz 2x2"<br>
+              · "Dame un ejemplo de combinación lineal en R³"<br><br>
+              Solo se mostrará la última respuesta generada, no hay histórico.
+            </div>
+          </div>
+          <div class="system-note">
+            Nota: cada nuevo prompt reemplaza el contenido anterior en este panel.
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-wrapper mt-1">
+          <div class="prompt-row">
+            <textarea
+              id="promptInput"
+              class="form-control prompt-textarea"
+              rows="2"
+              placeholder="Escribe tu pregunta de álgebra lineal aquí..."
+            ></textarea>
+            <button id="sendBtn" class="btn btn-send" type="button">
+              <span class="icon">➤</span>
+              <span>Enviar</span>
+            </button>
+          </div>
+          <div class="helper-row">
+            <div class="quick-prompts">
+              <span class="quick-pill" data-prompt="Explica qué es base y dimensión en un espacio vectorial.">
+                Base y dimensión
+              </span>
+              <span class="quick-pill" data-prompt="Resuelve un sistema de ecuaciones lineales 3x3 usando eliminación gaussiana, paso a paso.">
+                Sistema 3x3
+              </span>
+              <span class="quick-pill" data-prompt="Dame un ejemplo de autovalores y autovectores de una matriz 2x2.">
+                Autovalores 2x2
+              </span>
+            </div>
+            <div id="apiStatus" class="api-status">
+              <p>By Domingues Vasquez, Pedro Nequiz </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // API key incrustada (solo seguro en repos privados)
+    const GROQ_API_KEY = "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";
+
+    const $promptInput = $('#promptInput');
+    const $sendBtn = $('#sendBtn');
+    const $messagesPanel = $('#messagesPanel');
+    const $apiStatus = $('#apiStatus');
+
+    function setLoading(loading) {
+      if (loading) {
+        $sendBtn.prop('disabled', true).html(
+          '<span class="icon">⏳</span><span>Generando</span>'
+        );
+        $apiStatus
+          .removeClass('error')
+          .html(
+            'Consultando a la IA' +
+              '<span class="loader-dots">' +
+              '<span></span><span></span><span></span>' +
+              '</span>'
+          );
+      } else {
+        $sendBtn.prop('disabled', false).html(
+          '<span class="icon">➤</span><span>Enviar</span>'
+        );
+        $apiStatus.removeClass('error').text(
+          'Conectado directamente a API Groq (repositorio privado).'
+        );
+      }
+    }
+
+    function updateChatOnce(promptText, answerText) {
+      $messagesPanel.empty();
+
+      const userBlock = `
+        <div class="message">
+          <div class="message-label">Tú</div>
+          <div class="user-bubble">${$('<div>').text(promptText).html()}</div>
+        </div>
+      `;
+
+      const aiBlock = `
+        <div class="message">
+          <div class="message-label">IA</div>
+          <div class="ai-bubble">${answerText.replace(/\n/g, '<br>')}</div>
+        </div>
+      `;
+
+      const noteBlock = `
+        <div class="system-note">
+          Solo se muestra la última interacción. Al enviar un nuevo prompt se reemplazará este contenido.
+        </div>
+      `;
+
+      $messagesPanel.append(userBlock).append(aiBlock).append(noteBlock);
+      $messagesPanel.scrollTop($messagesPanel[0].scrollHeight);
+    }
+
+    async function handleSend() {
+      const promptText = $promptInput.val().trim();
+      if (!promptText) return;
+
+      try {
+        setLoading(true);
+
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + GROQ_API_KEY
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",  // modelo recomendado para chat. [web:21][web:38]
+            messages: [
+              {
+                role: "system",
+                content:
+                  "Eres un tutor experto en álgebra lineal. Responde SIEMPRE en español, con pasos claros, ejemplos numéricos y explicaciones pensadas para estudiantes."
+              },
+              {
+                role: "user",
+                content: promptText
+              }
+            ],
+            temperature: 0.2
+          })
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error("Groq error:", errText);
+          throw new Error("Error en la API Groq");
+        }
+
+        const data = await response.json();
+        const answer =
+          (data.choices &&
+            data.choices[0] &&
+            data.choices[0].message &&
+            data.choices[0].message.content) ||
+          "No pude generar respuesta.";
+
+        updateChatOnce(promptText, answer);
+      } catch (err) {
+        console.error(err);
+        $apiStatus
+          .addClass("error")
+          .text("Error al contactar Groq. Revisa la consola del navegador.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    $sendBtn.on('click', handleSend);
+
+    $promptInput.on('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+
+    $('.quick-pill').on('click', function () {
+      const p = $(this).data('prompt');
+      $promptInput.val(p);
+      $promptInput.focus();
+    });
+  </script>
+</body>
+</html>
